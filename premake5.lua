@@ -24,5 +24,6 @@ project "wave-function-collapse"
     language "C++"
     targetdir "build/bin/%{cfg.buildcfg}"
 
+    includedirs { "src/wave-function-collapse-lib/" }
     files { "src/wave-function-collapse/**.cpp", "src/wave-function-collapse/**.c" }
     links { "wave-function-collapse-lib" }
