@@ -98,8 +98,8 @@ struct map_t
 
     void propagate(std::size_t index)
     {
-        std::vector<std::size_t> queue;
-        std::set<std::size_t> seen;
+        std::vector<std::size_t> queue = {};
+        std::set<std::size_t> seen = {};
         queue.push_back(index);
 
         while (!queue.empty())
