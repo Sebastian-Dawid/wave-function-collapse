@@ -12,7 +12,7 @@ run:
 	premake5 gmake2;\
 	cd build;\
 	make config=release;\
-	./bin/Release/wave-function-collapse;\
+	./bin/Release/wave-function-collapse $(ARGS);\
 	cd ..
 
 debug:

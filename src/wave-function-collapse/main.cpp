@@ -64,10 +64,16 @@ int main(int argc, char** argv)
 
     std::size_t w = 12, h = 6;
 
-    if (argc == 3)
+    if (argc >= 3)
     {
         w = atol(argv[1]);
         h = atol(argv[2]);
+    }
+    
+    FILE* fd = stdout;
+    if (argc >= 4)
+    {
+        fd = fopen(argv[3], "w");
     }
 
     map_t<tile_t> map(w, h);
@@ -83,14 +89,13 @@ int main(int argc, char** argv)
         for (int i = 0; i < cap; ++i)
             map.map[i] = superposition;
         success = wave_function_collapse(map);
-        wprintf(L"iteration: %lu\n", iter++);
         for (std::size_t i = 0; i < map.depth; ++i)
         {
             for (std::size_t j = 0; j < map.width; ++j)
             {
-                wprintf(L"%lc", map.at(j, i).possibilities[0].symbol);
+                fwprintf(fd, L"%lc", map.at(j, i).possibilities[0].symbol);
             }
-            wprintf(L"\n");
+            fwprintf(fd, L"\n");
         }
     } while (!success);
 
