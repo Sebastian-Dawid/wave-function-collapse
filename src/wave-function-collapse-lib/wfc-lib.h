@@ -34,6 +34,7 @@ inline dir_t operator&(dir_t self, dir_t other)
 struct tile_i
 {
     virtual bool fits_dir(const tile_i& tile, const dir_t dir) const = 0;
+    virtual float get_weight() const = 0;
 };
 
 template <typename T>
@@ -60,11 +61,27 @@ struct superposition_t
         return neighbors;
     }
 
+    float shannon_entropy()
+    {
+        float total = 0.f, sum = 0.f;
+
+        for (T poss : this->possibilities)
+            total += poss.get_weight();
+
+        for (T poss : this->possibilities)
+            sum += poss.get_weight()/total * std::log2(poss.get_weight()/total);
+
+        return -sum;
+    }
+
     void collapse()
     {
         static std::random_device rd;
         static std::mt19937 rng(rd());
-        std::uniform_int_distribution<std::size_t> idx(0, this->possibilities.size() - 1);
+        std::vector<float> weights;
+        for (T poss : this->possibilities)
+            weights.push_back(poss.get_weight());
+        std::discrete_distribution<std::size_t> idx(weights.begin(), weights.end());
         this->collapsed = true;
         std::size_t chosen = idx(rng);
         this->possibilities = { this->possibilities[chosen] };
@@ -242,7 +259,7 @@ bool wave_function_collapse(map_t<T>& map)
             superposition_t<T>& pos = map.map[i];
             float entropy = std::numeric_limits<float>::infinity();
             if (pos.possibilities.size() > 1)
-                entropy = -std::log2(1./pos.possibilities.size());
+                entropy = pos.shannon_entropy();
             entropy_map[entropy].push_back(i);
             min_entropy = (min_entropy < entropy) ? min_entropy : entropy;
         }

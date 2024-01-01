@@ -18,10 +18,12 @@ struct tile_t : tile_i
 {
     char16_t symbol;
     std::array<bool, 4> edges = {0};
+    float weight = 1.f;
 
     bool fits_dir(const tile_i& tile, const dir_t dir) const override;
+    float get_weight() const override;
 
-    tile_t(char16_t symbol, std::array<bool, 4> edges);
+    tile_t(char16_t symbol, std::array<bool, 4> edges, float weight = 1.f);
 };
 
 bool tile_t::fits_dir(const tile_i& tile, const dir_t dir) const
@@ -41,10 +43,16 @@ bool tile_t::fits_dir(const tile_i& tile, const dir_t dir) const
     }
 }
 
-tile_t::tile_t(char16_t symbol, std::array<bool, 4> edges)
+float tile_t::get_weight() const
+{
+    return this->weight;
+}
+
+tile_t::tile_t(char16_t symbol, std::array<bool, 4> edges, float weight)
 {
     this->symbol = symbol;
-    this->edges = edges;
+    this->edges  = edges;
+    this->weight = weight;
 }
 
 template<>
