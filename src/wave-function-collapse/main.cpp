@@ -2,73 +2,23 @@
 #include <clocale>
 #include <wfc-lib.h>
 
-/*
- * Tiles: 
- * ━ horizontal.
- * ┃ vertical.
- * ╋ cross.
- * ┻ up, horizontal.
- * ┳ down, horizontal.
- * ┏ down, right corner.
- * ┓ down, left corner.
- * ┗ up, right corner.
- * ┛ up, left corner.
- */
-struct tile_t : tile_i
-{
-    char16_t symbol;
-    std::array<bool, 4> edges = {0};
-    float weight = 1.f;
-
-    bool fits_dir(const tile_i& tile, const dir_t dir) const override;
-    float get_weight() const override;
-
-    tile_t(char16_t symbol, std::array<bool, 4> edges, float weight = 1.f);
-};
-
-bool tile_t::fits_dir(const tile_i& tile, const dir_t dir) const
-{
-    tile_t& t = (tile_t&)tile;
-    switch (dir) {
-        case dir_t::NORTH:
-            return this->edges[2] == t.edges[0];
-        case dir_t::EAST:
-            return this->edges[1] == t.edges[3];
-        case dir_t::SOUTH:
-            return this->edges[0] == t.edges[2];
-        case dir_t::WEST:
-            return this->edges[3] == t.edges[1];
-        default:
-            return false;
-    }
-}
-
-float tile_t::get_weight() const
-{
-    return this->weight;
-}
-
-tile_t::tile_t(char16_t symbol, std::array<bool, 4> edges, float weight)
-{
-    this->symbol = symbol;
-    this->edges  = edges;
-    this->weight = weight;
-}
+#define UNICODE_TILE_IMPLEMENTATION
+#include <unicode_tile.h>
 
 template<>
-std::vector<tile_t> superposition_t<tile_t>::all_possibilities = {
-    tile_t(L' ', { 0, 0, 0, 0 }), tile_t(L'━', { 0, 1, 0, 1 }),
-    tile_t(L'┃', { 1, 0, 1, 0 }), tile_t(L'╋', { 1, 1, 1, 1 }),
-    tile_t(L'┻', { 1, 1, 0, 1 }), tile_t(L'┳', { 0, 1, 1, 1 }),
-    tile_t(L'┫', { 1, 0, 1, 1 }), tile_t(L'┣', { 1, 1, 1, 0 }),
-    tile_t(L'┏', { 0, 1, 1, 0 }), tile_t(L'┓', { 0, 0, 1, 1 }),
-    tile_t(L'┗', { 1, 1, 0, 0 }), tile_t(L'┛', { 1, 0, 0, 1 })
+std::vector<unicode_tile_t> superposition_t<unicode_tile_t>::all_possibilities = {
+    unicode_tile_t(L' ', { 0, 0, 0, 0 }), unicode_tile_t(L'━', { 0, 1, 0, 1 }),
+    unicode_tile_t(L'┃', { 1, 0, 1, 0 }), unicode_tile_t(L'╋', { 1, 1, 1, 1 }),
+    unicode_tile_t(L'┻', { 1, 1, 0, 1 }), unicode_tile_t(L'┳', { 0, 1, 1, 1 }),
+    unicode_tile_t(L'┫', { 1, 0, 1, 1 }), unicode_tile_t(L'┣', { 1, 1, 1, 0 }),
+    unicode_tile_t(L'┏', { 0, 1, 1, 0 }), unicode_tile_t(L'┓', { 0, 0, 1, 1 }),
+    unicode_tile_t(L'┗', { 1, 1, 0, 0 }), unicode_tile_t(L'┛', { 1, 0, 0, 1 })
 };
 
 int main(int argc, char** argv)
 {
-    superposition_t<tile_t> superposition;
-    superposition.possibilities = superposition_t<tile_t>::all_possibilities;
+    superposition_t<unicode_tile_t> superposition;
+    superposition.possibilities = superposition_t<unicode_tile_t>::all_possibilities;
 
     std::size_t w = 12, h = 6;
 
@@ -84,7 +34,7 @@ int main(int argc, char** argv)
         fd = fopen(argv[3], "w");
     }
 
-    map_t<tile_t> map(w, h);
+    map_t<unicode_tile_t> map(w, h);
     size_t cap = map.width * map.depth;
     for (int i = 0; i < cap; ++i)
         map.map.push_back(superposition);
