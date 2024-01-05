@@ -1,0 +1,3 @@
+[submodule "src/wave-function-collapse/includes"]
+	path = src/wave-function-collapse/includes
+	url = git@github.com:Sebastian-Dawid/includes.git

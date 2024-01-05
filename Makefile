@@ -5,19 +5,21 @@ SHELL := zsh
 
 .PHONY: clean run debug help
 
+BUILD_DIR = ./build
+
 clean:
 	rm -rf $(BUILD_DIR)
 
 run:
 	premake5 gmake2;\
-	cd build;\
+	cd $(BUILD_DIR);\
 	make config=release;\
 	./bin/Release/wave-function-collapse $(ARGS);\
 	cd ..
 
 debug:
 	premake5 gmake2;\
-	cd build;\
+	cd $(BUILD_DIR);\
 	make config=debug;\
 	$(DB) ./bin/Debug/wave-function-collapse;\
 	cd ..
