@@ -108,7 +108,18 @@ renderer_t::renderer_t(std::size_t w, std::size_t h)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(100 * w, 100 * h, "wfc", NULL, NULL);
+    if (w > h)
+    {
+        this->win_w = 1024;
+        this->win_h = ((float)h/w) * 1024;
+    }
+    else
+    {
+        this->win_h = 1024;
+        this->win_w = ((float)w/h) * 1024;
+    }
+
+    GLFWwindow* window = glfwCreateWindow(this->win_w, this->win_h, "wfc", NULL, NULL);
     if (window == NULL)
     {
         fprintf(stderr, "\033[0;31m[ERROR]:\033[0m Failed to create window!\n");
@@ -135,7 +146,7 @@ std::int32_t renderer_t::render()
 {
     if (!this->init) return -1;
 
-    glViewport(0, 0, 100 * w, 100 * h);
+    glViewport(0, 0, this->win_w, this->win_h);
     while (!glfwWindowShouldClose(this->window))
     {
         if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

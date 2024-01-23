@@ -27,3 +27,13 @@ project "wave-function-collapse"
     includedirs { "src/wave-function-collapse-lib/", "src/wave-function-collapse/includes" }
     files { "src/wave-function-collapse/*.cpp", "src/wave-function-collapse/renderer/*.cpp", "src/wave-function-collapse/includes/src/gl.c" }
     links { "wave-function-collapse-lib", "glfw", "GL" }
+
+project "3d-wave-function-collapse"
+    kind "ConsoleApp"
+    language "C++"
+    targetdir "build/bin/%{cfg.buildcfg}"
+
+    libdirs { "../vk-engine/build/lib/%{cfg.buildcfg}/" }
+    includedirs { "src/wave-function-collapse-lib/", "../vk-engine/include" }
+    files { "src/3d-wave-function-collapse/main.cpp" }
+    links { "fmt", "glfw", "vulkan", "vk-engine", "imgui", "fastgltf" }

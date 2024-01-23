@@ -6,6 +6,9 @@ SHELL := zsh
 .PHONY: clean run debug help
 
 BUILD_DIR = ./build
+ifndef BIN_NAME
+	BIN_NAME := wave-function-collapse
+endif
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -13,9 +16,9 @@ clean:
 run:
 	premake5 gmake2;\
 	cd $(BUILD_DIR);\
-	make config=release;\
-	./bin/Release/wave-function-collapse $(ARGS);\
-	cd ..
+	make config=debug;\
+	cd ..;\
+	./build/bin/Debug/$(BIN_NAME) $(ARGS)
 
 debug:
 	premake5 gmake2;\

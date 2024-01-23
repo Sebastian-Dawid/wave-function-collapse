@@ -7,7 +7,7 @@
 
 struct renderer_t
 {
-    std::size_t w, h;
+    std::size_t w, h, win_w, win_h;
     std::uint32_t VAO, VBO, EBO, shader;
     wfc::mesh_tile_t::mesh_t mesh;
     std::vector<float> vertices;
