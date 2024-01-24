@@ -110,10 +110,10 @@ namespace wfc
             {
                 return this->map[x + y * width];
             }
-            std::optional<superposition_t<T>&> at(std::size_t x, std::size_t y, std::size_t z)
+            std::optional<superposition_t<T>*> at(std::size_t x, std::size_t y, std::size_t z)
             {
                 if (this->dim == 2) return std::nullopt;
-                return this->map[x + y * width + z * width * depth];
+                return &this->map[x + y * width + z * width * depth];
             }
 
             void propagate(std::size_t index)
@@ -235,7 +235,7 @@ namespace wfc
                 }
             }
 
-            map_t(std::size_t width, std::size_t height) : dim(2), width(width), depth(height), height(0)
+            map_t(std::size_t width, std::size_t height) : dim(2), width(width), depth(height), height(1)
             {
                 this->map.reserve(width * height);
                 this->collapses_left = width * height;

@@ -24,7 +24,7 @@ debug:
 	premake5 gmake2;\
 	cd $(BUILD_DIR);\
 	make config=debug;\
-	$(DB) ./bin/Debug/wave-function-collapse;\
+	$(DB) ./bin/Debug/$(BIN_NAME);\
 	cd ..
 
 help:
