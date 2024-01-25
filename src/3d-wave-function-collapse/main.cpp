@@ -171,7 +171,7 @@ int main()
     wfc::superposition_t<gltf_tile_t> gltf_superposition;
     gltf_superposition.possibilities = gltf_superposition.all_possibilities;
 
-    wfc::map_t<gltf_tile_t> gltf_map(4, 4, 4);
+    wfc::map_t<gltf_tile_t> gltf_map(2, 2, 2);
     std::size_t capacity = gltf_map.width * gltf_map.height * gltf_map.depth;
     for (int i = 0; i < capacity; ++i)
         gltf_map.map.push_back(gltf_superposition);
@@ -191,20 +191,11 @@ int main()
             {
                 gltf_tile_t t = gltf_map.at(x, z, y).value()->possibilities[0];
                 if (!t.gltf_path.has_value()) continue;
-                fmt::print("{}\n", t.gltf_path.value());
                 if (!engine.load_model(t.gltf_path.value(), std::format("({}, {}, {})", x, y, z))) return EXIT_FAILURE;
                 engine.loaded_scenes[std::format("({}, {}, {})", x, y, z)]->transform = glm::translate(glm::vec3(x * 2, y * 2, z * 2) * scale) * t.rotation * glm::scale(glm::vec3(scale));
             }
         }
     }
-
-    /*std::size_t count = 0;
-    for (auto& t : gltf_superposition.all_possibilities)
-    {
-            if (!engine.load_model(t.gltf_path.value(), std::format("{}", count))) return EXIT_FAILURE;
-            engine.loaded_scenes[std::format("{}", count)]->transform = glm::translate(glm::vec3(0, 0, count * 2) * scale) * t.rotation * glm::scale(glm::vec3(scale));
-            count++;
-    }*/
 
     engine.run();
 

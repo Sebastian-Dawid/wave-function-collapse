@@ -10,11 +10,14 @@ ifndef BIN_NAME
 	BIN_NAME := wave-function-collapse
 endif
 ifndef CONFIG
-	CONFIG := debug
+CONFIG=debug
 endif
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR);\
+	cd external/vk-engine;\
+	make clean;\
+	cd ../..
 
 run:
 	@cd external/vk-engine;\
