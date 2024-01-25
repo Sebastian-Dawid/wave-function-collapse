@@ -160,7 +160,8 @@ int main()
         return EXIT_FAILURE;
     }
 
-    if (!engine.metal_rough_material.build_pipelines(&engine, "../vk-engine/tests/build/shaders/mesh.vert.spv", "../vk-engine/tests/build/shaders/mesh.frag.spv",
+    std::string pwd =  std::filesystem::current_path().string();
+    if (!engine.metal_rough_material.build_pipelines(&engine, pwd + "/external/vk-engine/tests/build/shaders/mesh.vert.spv", pwd + "/external/vk-engine/tests/build/shaders/mesh.frag.spv",
                 sizeof(gpu_draw_push_constants_t), { { 0, vk::DescriptorType::eUniformBuffer }, { 1, vk::DescriptorType::eCombinedImageSampler }, { 2, vk::DescriptorType::eCombinedImageSampler } },
                 { engine.scene_data.layout }))
     {
@@ -171,7 +172,7 @@ int main()
     wfc::superposition_t<gltf_tile_t> gltf_superposition;
     gltf_superposition.possibilities = gltf_superposition.all_possibilities;
 
-    wfc::map_t<gltf_tile_t> gltf_map(2, 2, 2);
+    wfc::map_t<gltf_tile_t> gltf_map(4, 4, 4);
     std::size_t capacity = gltf_map.width * gltf_map.height * gltf_map.depth;
     for (int i = 0; i < capacity; ++i)
         gltf_map.map.push_back(gltf_superposition);

@@ -1,5 +1,7 @@
 # wave-function-collapse
 
+C++ template library adapting the wave-function-collapse algorithm as outlined here: [mxgmn/WaveFunctionCollapse](https://github.com/mxgmn/WaveFunctionCollapse)
+
 ## Prerequisites
 * [Premake 5](https://premake.github.io/)
 * gcc >= 10 or clang >= 16
