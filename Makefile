@@ -9,19 +9,29 @@ BUILD_DIR = ./build
 ifndef BIN_NAME
 	BIN_NAME := wave-function-collapse
 endif
+ifndef CONFIG
+	CONFIG := debug
+endif
 
 clean:
 	rm -rf $(BUILD_DIR)
 
 run:
+	@cd external/vk-engine;\
+	make lib CONFIG=$(CONFIG);\
+	cd ../..;\
 	premake5 gmake2;\
 	cd $(BUILD_DIR);\
-	make config=debug;\
-	cd ..;\
-	./build/bin/Debug/$(BIN_NAME) $(ARGS)
+	make config=$(CONFIG);\
+	cd ..
+ifeq ($(CONFIG), debug)
+	@./build/bin/Debug/$(BIN_NAME) $(ARGS)
+else
+	@./build/bin/Release/$(BIN_NAME) $(ARGS)
+endif
 
 debug:
-	premake5 gmake2;\
+	@premake5 gmake2;\
 	cd $(BUILD_DIR);\
 	make config=debug;\
 	$(DB) ./bin/Debug/$(BIN_NAME);\

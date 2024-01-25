@@ -1,3 +1,6 @@
-[submodule "src/wave-function-collapse/includes"]
-	path = src/wave-function-collapse/includes
+[submodule "external/vk-engine"]
+	path = external/vk-engine
+	url = git@github.com:Sebastian-Dawid/vk-engine.git
+[submodule "external/includes"]
+	path = external/includes
 	url = git@github.com:Sebastian-Dawid/includes.git
