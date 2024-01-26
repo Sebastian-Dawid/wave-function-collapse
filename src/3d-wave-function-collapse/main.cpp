@@ -14,7 +14,7 @@ struct gltf_tile_t : wfc::tile_i
     // NORTH, EAST, SOUTH, WEST, UP, DOWN
     std::array<bool, 6> faces = {};
     float weight = 1.f;
-    std::optional<std::string> gltf_path = std::nullopt;
+    std::optional<std::uint32_t> tile_index = std::nullopt;
     glm::mat4 rotation = glm::mat4(1.f);
 
     bool fits_dir(const tile_i& tile, const wfc::dir_t dir) const override
@@ -51,16 +51,28 @@ struct gltf_tile_t : wfc::tile_i
  
     bool operator==(const gltf_tile_t& other) const
     {
-        return this->rotation == other.rotation && this->gltf_path == other.gltf_path;
+        return this->rotation == other.rotation && this->tile_index == other.tile_index;
     };
 
-    gltf_tile_t(std::optional<std::string> path, glm::mat4 rotation, std::array<bool, 6> faces, float weight = 1.f)
+    gltf_tile_t(std::optional<std::uint32_t> index, glm::mat4 rotation, std::array<bool, 6> faces, float weight = 1.f)
     {
-        this->gltf_path = path;
+        this->tile_index = index;
         this->rotation = rotation;
         this->faces = faces;
         this->weight = weight;
     }
+};
+
+std::vector<std::string> tileset = {
+    "./assets/tileset/all.glb",
+    "./assets/tileset/all_but_one.glb",
+    "./assets/tileset/all_but_two.glb",
+    "./assets/tileset/plus_xz.glb",
+    "./assets/tileset/3_corner.glb",
+    "./assets/tileset/t_shape.glb",
+    "./assets/tileset/2_corner.glb",
+    "./assets/tileset/straight.glb",
+    "./assets/tileset/straight_half.glb"
 };
 
 template<>
@@ -68,81 +80,81 @@ std::vector<gltf_tile_t> wfc::superposition_t<gltf_tile_t>::all_possibilities = 
     gltf_tile_t(std::nullopt, glm::mat4(1.f), { 0 }),
     
     // one option
-    gltf_tile_t("./assets/tileset/all.glb", glm::mat4(1.f), { true, true, true, true, true, true }),
+    gltf_tile_t(0, glm::mat4(1.f), { true, true, true, true, true, true }),
 
     //// 6 options
-    gltf_tile_t("./assets/tileset/all_but_one.glb", glm::mat4(1.f), { true, true, true, true, false, true }),
-    gltf_tile_t("./assets/tileset/all_but_one.glb", glm::rotate(glm::radians( 90.f), glm::vec3(1, 0, 0)), { true, true, false, true, true, true }),
-    gltf_tile_t("./assets/tileset/all_but_one.glb", glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { true, true, true, true, true, false }),
-    gltf_tile_t("./assets/tileset/all_but_one.glb", glm::rotate(glm::radians(270.f), glm::vec3(1, 0, 0)), { false, true, true, true, true, true }),
-    gltf_tile_t("./assets/tileset/all_but_one.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 0, 1)), { true, true, true, false, true, true }),
-    gltf_tile_t("./assets/tileset/all_but_one.glb", glm::rotate(glm::radians(270.f), glm::vec3(0, 0, 1)), { true, false, true, true, true, true }),
+    gltf_tile_t(1, glm::mat4(1.f), { true, true, true, true, false, true }),
+    gltf_tile_t(1, glm::rotate(glm::radians( 90.f), glm::vec3(1, 0, 0)), { true, true, false, true, true, true }),
+    gltf_tile_t(1, glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { true, true, true, true, true, false }),
+    gltf_tile_t(1, glm::rotate(glm::radians(270.f), glm::vec3(1, 0, 0)), { false, true, true, true, true, true }),
+    gltf_tile_t(1, glm::rotate(glm::radians( 90.f), glm::vec3(0, 0, 1)), { true, true, true, false, true, true }),
+    gltf_tile_t(1, glm::rotate(glm::radians(270.f), glm::vec3(0, 0, 1)), { true, false, true, true, true, true }),
 
     // 10 options
-    gltf_tile_t("./assets/tileset/all_but_two.glb", glm::mat4(1.f), { true, false, true, true, false, true }),
-    gltf_tile_t("./assets/tileset/all_but_two.glb", glm::rotate(glm::radians( 90.f), glm::vec3(1, 0, 0)), { true, false, false, true, true, true }),
-    gltf_tile_t("./assets/tileset/all_but_two.glb", glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { true, false, true, true, true, false }),
-    gltf_tile_t("./assets/tileset/all_but_two.glb", glm::rotate(glm::radians(270.f), glm::vec3(1, 0, 0)), { false, false, true, true, true, true }),
-    gltf_tile_t("./assets/tileset/all_but_two.glb", glm::rotate(glm::radians(180.f), glm::vec3(0, 0, 1)), { true, true, true, false, true, false }),
-    gltf_tile_t("./assets/tileset/all_but_two.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 0, 1)), { true, true, true, false, false, true }),
-    gltf_tile_t("./assets/tileset/all_but_two.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { false, true, true, true, false, true }),
-    gltf_tile_t("./assets/tileset/all_but_two.glb", glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)), { true, true, false, true, false, true }),
-    gltf_tile_t("./assets/tileset/all_but_two.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, true, true, true, true, false }),
-    gltf_tile_t("./assets/tileset/all_but_two.glb", glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { true, true, false, true, true, false }),
+    gltf_tile_t(2, glm::mat4(1.f), { true, false, true, true, false, true }),
+    gltf_tile_t(2, glm::rotate(glm::radians( 90.f), glm::vec3(1, 0, 0)), { true, false, false, true, true, true }),
+    gltf_tile_t(2, glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { true, false, true, true, true, false }),
+    gltf_tile_t(2, glm::rotate(glm::radians(270.f), glm::vec3(1, 0, 0)), { false, false, true, true, true, true }),
+    gltf_tile_t(2, glm::rotate(glm::radians(180.f), glm::vec3(0, 0, 1)), { true, true, true, false, true, false }),
+    gltf_tile_t(2, glm::rotate(glm::radians( 90.f), glm::vec3(0, 0, 1)), { true, true, true, false, false, true }),
+    gltf_tile_t(2, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { false, true, true, true, false, true }),
+    gltf_tile_t(2, glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)), { true, true, false, true, false, true }),
+    gltf_tile_t(2, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, true, true, true, true, false }),
+    gltf_tile_t(2, glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { true, true, false, true, true, false }),
 
     // 3 options
-    gltf_tile_t("./assets/tileset/plus_xz.glb", glm::mat4(1.f), { false, true, false, true, true, true }),
-    gltf_tile_t("./assets/tileset/plus_xz.glb", glm::rotate(glm::radians( 90.f), glm::vec3(1, 0, 0)), { true, true, true, true, false, false }),
-    gltf_tile_t("./assets/tileset/plus_xz.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { true, false, true, false, true, true }),
+    gltf_tile_t(3, glm::mat4(1.f), { false, true, false, true, true, true }),
+    gltf_tile_t(3, glm::rotate(glm::radians( 90.f), glm::vec3(1, 0, 0)), { true, true, true, true, false, false }),
+    gltf_tile_t(3, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { true, false, true, false, true, true }),
 
     // 8 options
-    gltf_tile_t("./assets/tileset/3_corner.glb", glm::mat4(1.f), { true, false, false, true, false, true }),
-    gltf_tile_t("./assets/tileset/3_corner.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { false, false, true, true, false, true }),
-    gltf_tile_t("./assets/tileset/3_corner.glb", glm::rotate(glm::radians(180.f), glm::vec3(0, 1, 0)), { false, true, true, false, false, true }),
-    gltf_tile_t("./assets/tileset/3_corner.glb", glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)), { true, true, false, false, false, true }),
-    gltf_tile_t("./assets/tileset/3_corner.glb", glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, false, true, true, true, false }),
-    gltf_tile_t("./assets/tileset/3_corner.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, true, true, false, true, false }),
-    gltf_tile_t("./assets/tileset/3_corner.glb", glm::rotate(glm::radians(180.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { true, true, false, false, true, false }),
-    gltf_tile_t("./assets/tileset/3_corner.glb", glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { true, false, false, true, true, false }),
+    gltf_tile_t(4, glm::mat4(1.f), { true, false, false, true, false, true }),
+    gltf_tile_t(4, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { false, false, true, true, false, true }),
+    gltf_tile_t(4, glm::rotate(glm::radians(180.f), glm::vec3(0, 1, 0)), { false, true, true, false, false, true }),
+    gltf_tile_t(4, glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)), { true, true, false, false, false, true }),
+    gltf_tile_t(4, glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, false, true, true, true, false }),
+    gltf_tile_t(4, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, true, true, false, true, false }),
+    gltf_tile_t(4, glm::rotate(glm::radians(180.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { true, true, false, false, true, false }),
+    gltf_tile_t(4, glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { true, false, false, true, true, false }),
 
     // 12 options
-    gltf_tile_t("./assets/tileset/t_shape.glb", glm::mat4(1.f), { true, false, true, false, false, true }),
-    gltf_tile_t("./assets/tileset/t_shape.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 0, 1)), { true, true, true, false, false, false }),
-    gltf_tile_t("./assets/tileset/t_shape.glb", glm::rotate(glm::radians(180.f), glm::vec3(0, 0, 1)), { true, false, true, false, true, false }),
-    gltf_tile_t("./assets/tileset/t_shape.glb", glm::rotate(glm::radians(270.f), glm::vec3(0, 0, 1)), { true, false, true, true, false, false }),
-    gltf_tile_t("./assets/tileset/t_shape.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { false, true, false, true, false, true }),
-    gltf_tile_t("./assets/tileset/t_shape.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians( 90.f), glm::vec3(0, 0, 1)), { true, true, false, true, false, false }),
-    gltf_tile_t("./assets/tileset/t_shape.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(0, 0, 1)), { false, true, false, true, true, false }),
-    gltf_tile_t("./assets/tileset/t_shape.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(270.f), glm::vec3(0, 0, 1)), { false, true, true, true, false, false }),
-    gltf_tile_t("./assets/tileset/t_shape.glb", glm::rotate(glm::radians(90.f), glm::vec3(1, 0, 0)), { true, false, false, false, true, true }),
-    gltf_tile_t("./assets/tileset/t_shape.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(90.f), glm::vec3(1, 0, 0)), { false, false, false, true, true, true }),
-    gltf_tile_t("./assets/tileset/t_shape.glb", glm::rotate(glm::radians(180.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(90.f), glm::vec3(1, 0, 0)), { false, false, true, false, true, true }),
-    gltf_tile_t("./assets/tileset/t_shape.glb", glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(90.f), glm::vec3(1, 0, 0)), { false, true, false, false, true, true }),
+    gltf_tile_t(5, glm::mat4(1.f), { true, false, true, false, false, true }),
+    gltf_tile_t(5, glm::rotate(glm::radians( 90.f), glm::vec3(0, 0, 1)), { true, true, true, false, false, false }),
+    gltf_tile_t(5, glm::rotate(glm::radians(180.f), glm::vec3(0, 0, 1)), { true, false, true, false, true, false }),
+    gltf_tile_t(5, glm::rotate(glm::radians(270.f), glm::vec3(0, 0, 1)), { true, false, true, true, false, false }),
+    gltf_tile_t(5, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { false, true, false, true, false, true }),
+    gltf_tile_t(5, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians( 90.f), glm::vec3(0, 0, 1)), { true, true, false, true, false, false }),
+    gltf_tile_t(5, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(0, 0, 1)), { false, true, false, true, true, false }),
+    gltf_tile_t(5, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(270.f), glm::vec3(0, 0, 1)), { false, true, true, true, false, false }),
+    gltf_tile_t(5, glm::rotate(glm::radians(90.f), glm::vec3(1, 0, 0)), { true, false, false, false, true, true }),
+    gltf_tile_t(5, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(90.f), glm::vec3(1, 0, 0)), { false, false, false, true, true, true }),
+    gltf_tile_t(5, glm::rotate(glm::radians(180.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(90.f), glm::vec3(1, 0, 0)), { false, false, true, false, true, true }),
+    gltf_tile_t(5, glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(90.f), glm::vec3(1, 0, 0)), { false, true, false, false, true, true }),
     
     // 10 options
-    gltf_tile_t("./assets/tileset/2_corner.glb", glm::mat4(1.f), { true, false, false, false, false, true }),
-    gltf_tile_t("./assets/tileset/2_corner.glb", glm::rotate(glm::radians( 90.f), glm::vec3(1, 0, 0)), { true, false, false, false, true, false }),
-    gltf_tile_t("./assets/tileset/2_corner.glb", glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, false, true, false, true, false }),
-    gltf_tile_t("./assets/tileset/2_corner.glb", glm::rotate(glm::radians(270.f), glm::vec3(1, 0, 0)), { false, false, true, false, false, true }),
-    gltf_tile_t("./assets/tileset/2_corner.glb", glm::rotate(glm::radians(270.f), glm::vec3(0, 0, 1)), { true, false, false, true, false, false }),
-    gltf_tile_t("./assets/tileset/2_corner.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 0, 1)), { true, true, false, false, false, false }),
-    gltf_tile_t("./assets/tileset/2_corner.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { false, false, false, true, false, true }),
-    gltf_tile_t("./assets/tileset/2_corner.glb", glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)), { false, true, false, false, false, true }),
-    gltf_tile_t("./assets/tileset/2_corner.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, true, false, false, true, false }),
-    gltf_tile_t("./assets/tileset/2_corner.glb", glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, false, false, true, true, false }),
+    gltf_tile_t(6, glm::mat4(1.f), { true, false, false, false, false, true }),
+    gltf_tile_t(6, glm::rotate(glm::radians( 90.f), glm::vec3(1, 0, 0)), { true, false, false, false, true, false }),
+    gltf_tile_t(6, glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, false, true, false, true, false }),
+    gltf_tile_t(6, glm::rotate(glm::radians(270.f), glm::vec3(1, 0, 0)), { false, false, true, false, false, true }),
+    gltf_tile_t(6, glm::rotate(glm::radians(270.f), glm::vec3(0, 0, 1)), { true, false, false, true, false, false }),
+    gltf_tile_t(6, glm::rotate(glm::radians( 90.f), glm::vec3(0, 0, 1)), { true, true, false, false, false, false }),
+    gltf_tile_t(6, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { false, false, false, true, false, true }),
+    gltf_tile_t(6, glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)), { false, true, false, false, false, true }),
+    gltf_tile_t(6, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, true, false, false, true, false }),
+    gltf_tile_t(6, glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)) * glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, false, false, true, true, false }),
 
     // 3 options
-    gltf_tile_t("./assets/tileset/straight.glb", glm::mat4(1.f), { true, false, true, false, false, false }),
-    gltf_tile_t("./assets/tileset/straight.glb", glm::rotate(glm::radians( 90.f), glm::vec3(1, 0, 0)), { false, false, false, false, true, true }),
-    gltf_tile_t("./assets/tileset/straight.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { false, true, false, true, false, false }),
+    gltf_tile_t(7, glm::mat4(1.f), { true, false, true, false, false, false }),
+    gltf_tile_t(7, glm::rotate(glm::radians( 90.f), glm::vec3(1, 0, 0)), { false, false, false, false, true, true }),
+    gltf_tile_t(7, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { false, true, false, true, false, false }),
     
     // 6 options
-    gltf_tile_t("./assets/tileset/straight_half.glb", glm::mat4(1.f), { true, false, false, false, false, false }),
-    gltf_tile_t("./assets/tileset/straight_half.glb", glm::rotate(glm::radians( 90.f), glm::vec3(1, 0, 0)), { false, false, false, false, true, false }),
-    gltf_tile_t("./assets/tileset/straight_half.glb", glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, false, true, false, false, false }),
-    gltf_tile_t("./assets/tileset/straight_half.glb", glm::rotate(glm::radians(270.f), glm::vec3(1, 0, 0)), { false, false, false, false, false, true }),
-    gltf_tile_t("./assets/tileset/straight_half.glb", glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { false, false, false, true, false, false }),
-    gltf_tile_t("./assets/tileset/straight_half.glb", glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)), { false, true, false, false, false, false }),
+    gltf_tile_t(8, glm::mat4(1.f), { true, false, false, false, false, false }),
+    gltf_tile_t(8, glm::rotate(glm::radians( 90.f), glm::vec3(1, 0, 0)), { false, false, false, false, true, false }),
+    gltf_tile_t(8, glm::rotate(glm::radians(180.f), glm::vec3(1, 0, 0)), { false, false, true, false, false, false }),
+    gltf_tile_t(8, glm::rotate(glm::radians(270.f), glm::vec3(1, 0, 0)), { false, false, false, false, false, true }),
+    gltf_tile_t(8, glm::rotate(glm::radians( 90.f), glm::vec3(0, 1, 0)), { false, false, false, true, false, false }),
+    gltf_tile_t(8, glm::rotate(glm::radians(270.f), glm::vec3(0, 1, 0)), { false, true, false, false, false, false }),
 };
 
 float scale = .3f;
@@ -163,9 +175,19 @@ int main()
     std::string pwd =  std::filesystem::current_path().string();
     if (!engine.metal_rough_material.build_pipelines(&engine, pwd + "/external/vk-engine/tests/build/shaders/mesh.vert.spv", pwd + "/external/vk-engine/tests/build/shaders/mesh.frag.spv",
                 sizeof(gpu_draw_push_constants_t), { { 0, vk::DescriptorType::eUniformBuffer }, { 1, vk::DescriptorType::eCombinedImageSampler }, { 2, vk::DescriptorType::eCombinedImageSampler } },
-                { engine.scene_data.layout }))
+                { engine.scene_data.layout }, { vk::VertexInputBindingDescription(0, sizeof(glm::mat4), vk::VertexInputRate::eInstance) },
+                { vk::VertexInputAttributeDescription(0, 0, vk::Format::eR32G32B32A32Sfloat, 0),
+                vk::VertexInputAttributeDescription(1, 0, vk::Format::eR32G32B32A32Sfloat, sizeof(float) * 4),
+                vk::VertexInputAttributeDescription(2, 0, vk::Format::eR32G32B32A32Sfloat, sizeof(float) * 8),
+                vk::VertexInputAttributeDescription(3, 0, vk::Format::eR32G32B32A32Sfloat, sizeof(float) * 12)}))
     {
         return EXIT_FAILURE;
+    }
+
+    std::vector<std::shared_ptr<loaded_gltf_t>> tiles;
+    for (std::string asset : tileset)
+    {
+        tiles.push_back(load_gltf(&engine, asset).value());
     }
 
     fmt::print("[ {} ]\tWFC started!\n", INFO_FMT("INFO"));
@@ -191,9 +213,9 @@ int main()
             for (std::size_t x = 0; x < gltf_map.width; ++x)
             {
                 gltf_tile_t t = gltf_map.at(x, z, y).value()->possibilities[0];
-                if (!t.gltf_path.has_value()) continue;
-                if (!engine.load_model(t.gltf_path.value(), std::format("({}, {}, {})", x, y, z))) return EXIT_FAILURE;
-                engine.loaded_scenes[std::format("({}, {}, {})", x, y, z)]->transform = glm::translate(glm::vec3(x * 2, y * 2, z * 2) * scale) * t.rotation * glm::scale(glm::vec3(scale));
+                if (!t.tile_index.has_value()) continue;
+                engine.loaded_scenes[std::format("{}", t.tile_index.value())] = tiles[t.tile_index.value()];
+                engine.loaded_scenes[std::format("{}", t.tile_index.value())]->transform.push_back(glm::translate(glm::vec3(x * 2, y * 2, z * 2) * scale) * t.rotation * glm::scale(glm::vec3(scale)));
             }
         }
     }
