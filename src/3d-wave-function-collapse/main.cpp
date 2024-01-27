@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fmt/core.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp>
 
 #include <format>
@@ -194,7 +195,7 @@ int main()
     wfc::superposition_t<gltf_tile_t> gltf_superposition;
     gltf_superposition.possibilities = gltf_superposition.all_possibilities;
 
-    wfc::map_t<gltf_tile_t> gltf_map(4, 4, 4);
+    wfc::map_t<gltf_tile_t> gltf_map(6, 6, 6);
     std::size_t capacity = gltf_map.width * gltf_map.height * gltf_map.depth;
     for (int i = 0; i < capacity; ++i)
         gltf_map.map.push_back(gltf_superposition);
