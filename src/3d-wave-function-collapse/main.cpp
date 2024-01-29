@@ -7,6 +7,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp>
 
+#include <imgui.h>
+
 #include <format>
 #include <error_fmt.h>
 
@@ -168,6 +170,10 @@ int main()
         fmt::print("\t{}\n", entry.path().string());
 
     engine_t engine(1024, 1024, "wfc", true, true);
+
+    camera_t cam{ .position = glm::vec3(0.f) };
+    glfwSetWindowUserPointer(engine.window.win, &cam);
+
     if (!engine.init_vulkan("wfc"))
     {
         return EXIT_FAILURE;
@@ -220,6 +226,45 @@ int main()
             }
         }
     }
+
+    engine.define_imgui_windows = [&]()
+    {
+        if (ImGui::Begin("Resolution"))
+        {
+            ImGui::SliderFloat("Render Scale",&engine.render_scale, 0.01f, 1.f);
+            ImGui::Text("Render Resolution: (%d, %d)", engine.draw_extent.width, engine.draw_extent.height);
+            ImGui::Text("Window Resolution: (%d, %d)", engine.swapchain.extent.width, engine.swapchain.extent.height);
+            ImGui::Text("Buffer Resolution: (%d, %d)", engine.draw_image.extent.width, engine.draw_image.extent.height);
+            ImGui::End();
+        }
+
+        if (ImGui::Begin("Light"))
+        {
+            ImGui::ColorEdit4("ambient color", (float*) &engine.scene_data.gpu_data.ambient_color);
+            ImGui::ColorEdit4("light color", (float*) &engine.scene_data.gpu_data.sunlight_color);
+            ImGui::InputFloat4("light dir", (float*) &engine.scene_data.gpu_data.sunlight_dir);
+            ImGui::End();
+        }
+    };
+
+    engine.input_handler = [&]()
+    {
+        if (glfwGetKey(engine.window.win, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(engine.window.win, GLFW_TRUE);
+        cam.process_glfw_event(engine.window.win);
+    };
+
+    engine.update = [&]()
+    {
+        engine.background_effects[0].data.data3.x = engine.window.width;
+        engine.background_effects[0].data.data3.y = engine.window.height;
+        engine.background_effects[0].data.data3.z = engine.render_scale;
+        cam.update();
+
+        engine.scene_data.gpu_data.view = cam.get_view_matrix();
+        engine.scene_data.gpu_data.proj = glm::perspective(glm::radians(70.f), (float)engine.window.width / (float)engine.window.height, .1f, 10000.f);
+        engine.scene_data.gpu_data.proj[1][1] *= -1;
+        engine.scene_data.gpu_data.viewproj = engine.scene_data.gpu_data.proj * engine.scene_data.gpu_data.view ;
+    };
 
     engine.run();
 

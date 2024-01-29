@@ -34,6 +34,6 @@ project "3d-wave-function-collapse"
     targetdir "build/bin/%{cfg.buildcfg}"
 
     libdirs { "external/vk-engine/build/lib/%{cfg.buildcfg}/" }
-    includedirs { "src/wave-function-collapse-lib/", "external/vk-engine/include" }
+    includedirs { "src/wave-function-collapse-lib/", "external/vk-engine/include", "external/vk-engine/external/imgui" }
     files { "src/3d-wave-function-collapse/main.cpp" }
     links { "fmt", "glfw", "vulkan", "vk-engine", "imgui", "fastgltf" }
