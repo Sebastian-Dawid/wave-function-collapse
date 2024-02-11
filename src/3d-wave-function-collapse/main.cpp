@@ -174,6 +174,8 @@ int main()
     camera_t cam{ .position = glm::vec3(0.f) };
     glfwSetWindowUserPointer(engine.window.win, &cam);
 
+    engine.init_pipelines = [&](){ return engine.init_background_pipelines(); };
+
     if (!engine.init_vulkan("wfc"))
     {
         return EXIT_FAILURE;
