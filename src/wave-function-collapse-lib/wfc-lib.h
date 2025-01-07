@@ -281,6 +281,7 @@ namespace wfc
                         break;
                     }
                 }
+                if (possible_collapses == 0) return false;
 
                 std::uniform_int_distribution<std::size_t> idx(0, possible_collapses);
                 std::size_t chosen = idx(rng);
