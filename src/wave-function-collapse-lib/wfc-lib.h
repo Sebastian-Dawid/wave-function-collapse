@@ -256,40 +256,29 @@ namespace wfc
             while (map.collapses_left != 0)
             {
                 float min_entropy = std::numeric_limits<float>::infinity();
-                std::map<float, std::vector<std::size_t>> entropy_map;
+                std::vector<std::size_t> vec;
+                vec.reserve(map.map.size());
                 for (std::size_t i = 0; i < map.map.size(); ++i)
                 {
                     superposition_t<T>& pos = map.map[i];
-                    float entropy = std::numeric_limits<float>::infinity();
-                    if (pos.possibilities.size() > 1)
-                    {
-                        entropy = pos.shannon_entropy();
-                        entropy_map[entropy].push_back(i);
-                    }
-                    min_entropy = (min_entropy < entropy) ? min_entropy : entropy;
-                }
-
-                std::size_t possible_collapses = 0;
-                std::vector<std::size_t> vec;
-
-                for (std::pair<float, std::vector<std::size_t>> val : entropy_map)
-                {
-                    if (val.first == min_entropy)
-                    {
-                        possible_collapses = val.second.size() - 1;
-                        vec = val.second;
-                        break;
+                    if (pos.possibilities.size() <= 1) continue;
+                    float entropy = pos.shannon_entropy();
+                    if (entropy < min_entropy) {
+                        min_entropy = entropy;
+                        vec = { i };
+                    } else if (entropy == min_entropy) {
+                        vec.push_back(i);
                     }
                 }
-                if (possible_collapses == 0) return false;
+                if (vec.size() == 0) return false;
 
-                std::uniform_int_distribution<std::size_t> idx(0, possible_collapses);
-                std::size_t chosen = idx(rng);
+                std::uniform_int_distribution<std::size_t> idx(0, vec.size() - 1);
+                const std::size_t chosen = vec[idx(rng)];
 
-                superposition_t<T>& to_collapse = map.map[vec[chosen]];
+                superposition_t<T>& to_collapse = map.map[chosen];
                 if (to_collapse.possibilities.size() == 0) return false;
                 to_collapse.collapse();
-                map.propagate(vec[chosen]);
+                map.propagate(chosen);
                 map.collapses_left--;
             }
             return true;
