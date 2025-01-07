@@ -265,7 +265,8 @@ namespace wfc
                     float entropy = pos.shannon_entropy();
                     if (entropy < min_entropy) {
                         min_entropy = entropy;
-                        vec = { i };
+                        vec.clear();
+                        vec.push_back(i);
                     } else if (entropy == min_entropy) {
                         vec.push_back(i);
                     }
