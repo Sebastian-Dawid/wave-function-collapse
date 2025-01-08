@@ -21,7 +21,7 @@ namespace wfc
         DOWN  = 32
     };
 
-    inline static std::vector<dir_t> ALL_DIRS = { dir_t::NORTH, dir_t::EAST, dir_t::SOUTH, dir_t::WEST, dir_t::UP, dir_t::DOWN };
+    inline static std::array<dir_t, 6> ALL_DIRS = { dir_t::NORTH, dir_t::EAST, dir_t::SOUTH, dir_t::WEST, dir_t::UP, dir_t::DOWN };
 
     inline dir_t operator|(dir_t self, dir_t other)
     {
@@ -31,6 +31,24 @@ namespace wfc
     inline dir_t operator&(dir_t self, dir_t other)
     {
         return (dir_t)((std::uint8_t)self & (std::uint8_t)other);
+    }
+
+    inline dir_t opposite(dir_t self)
+    {
+        switch (self) {
+            case dir_t::NORTH:
+                return dir_t::SOUTH;
+            case dir_t::EAST:
+                return dir_t::WEST;
+            case dir_t::SOUTH:
+                return dir_t::NORTH;
+            case dir_t::WEST:
+                return dir_t::EAST;
+            case dir_t::UP:
+                return dir_t::DOWN;
+            case dir_t::DOWN:
+                return dir_t::UP;
+        }
     }
 
     struct tile_i
@@ -50,9 +68,9 @@ namespace wfc
             std::vector<T> find_possible_neighbors(const dir_t dir)
             {
                 std::vector<T> neighbors;
-                for (T& a_poss : all_possibilities)
+                for (const T& a_poss : all_possibilities)
                 {
-                    for (T& poss : this->possibilities)
+                    for (const T& poss : this->possibilities)
                     {
                         if (poss.fits_dir(a_poss, dir))
                         {
@@ -116,7 +134,7 @@ namespace wfc
                 return &this->map[x + y * width + z * width * depth];
             }
 
-            void propagate(std::size_t index)
+            [[nodiscard]] bool propagate(std::size_t index)
             {
                 std::vector<std::size_t> queue = {};
                 std::set<std::size_t> seen = {};
@@ -126,6 +144,7 @@ namespace wfc
                 {
                     std::size_t val = queue.front();
                     seen.insert(val);
+
                     queue.erase(queue.begin());
                     std::size_t width, depth, height;
                     width = val % this->width;
@@ -134,10 +153,12 @@ namespace wfc
                     superposition_t<T>& pos = this->map[val];
                     for (const dir_t dir : ALL_DIRS)
                     {
+                        // skip up and down directions if we are in the two dimensional case
+                        if ((dir == dir_t::UP || dir == dir_t::DOWN) && this->dim == 2) continue;
                         std::vector<T> neighbors = pos.find_possible_neighbors(dir);
                         std::vector<T> intersection = {};
                         superposition_t<T>* next_pos = NULL;
-                        std::function set_possibilities_to_intersection = [&] {
+                        std::function set_possibilities_to_intersection = [&] (const std::size_t v) -> bool {
                             for (T val : next_pos->possibilities)
                             {
                                 for (T n : neighbors)
@@ -150,6 +171,21 @@ namespace wfc
                                 }
                             }
                             next_pos->possibilities = intersection;
+                            intersection.clear();
+                            neighbors = next_pos->find_possible_neighbors(opposite(dir));
+                            for (T val : pos.possibilities)
+                            {
+                                for (T n : neighbors)
+                                {
+                                    if (n == val)
+                                    {
+                                        intersection.push_back(val);
+                                        break;
+                                    }
+                                }
+                            }
+                            pos.possibilities = intersection;
+                            return pos.possibilities.size() != 0 && next_pos->possibilities.size() != 0;
                         };
                         switch (dir) {
                             case dir_t::NORTH:
@@ -157,7 +193,7 @@ namespace wfc
                                 {
                                     next_pos = &this->map[val + this->width];
                                     if (next_pos->collapsed) break;
-                                    set_possibilities_to_intersection();
+                                    if (!set_possibilities_to_intersection(val + this->width)) return false;
                                     queue.push_back(val + this->width);
                                     if (std::count(queue.begin(), queue.end(), val + this->width) > 1)
                                     {
@@ -170,7 +206,7 @@ namespace wfc
                                 {
                                     next_pos = &this->map[val + 1];
                                     if (next_pos->collapsed) break;
-                                    set_possibilities_to_intersection();
+                                    if (!set_possibilities_to_intersection(val + 1)) return false;
                                     queue.push_back(val + 1);
                                     if (std::count(queue.begin(), queue.end(), val + 1) > 1)
                                     {
@@ -183,7 +219,7 @@ namespace wfc
                                 {
                                     next_pos = &this->map[val - this->width];
                                     if (next_pos->collapsed) break;
-                                    set_possibilities_to_intersection();
+                                    if (!set_possibilities_to_intersection(val - this->width)) return false;
                                     queue.push_back(val - this->width);
                                     if (std::count(queue.begin(), queue.end(), val - this->width) > 1)
                                     {
@@ -196,7 +232,7 @@ namespace wfc
                                 {
                                     next_pos = &this->map[val - 1];
                                     if (next_pos->collapsed) break;
-                                    set_possibilities_to_intersection();
+                                    if (!set_possibilities_to_intersection(val - 1)) return false;
                                     queue.push_back(val - 1);
                                     if (std::count(queue.begin(), queue.end(), val - 1) > 1)
                                     {
@@ -209,7 +245,7 @@ namespace wfc
                                 {
                                     next_pos = &this->map[val + this->width * this->depth];
                                     if (next_pos->collapsed) break;
-                                    set_possibilities_to_intersection();
+                                    if (!set_possibilities_to_intersection(val + this->width * this->depth)) return false;
                                     queue.push_back(val + this->width * this->depth);
                                     if (std::count(queue.begin(), queue.end(), val + this->width * this->depth) > 1)
                                     {
@@ -222,7 +258,7 @@ namespace wfc
                                 {
                                     next_pos = &this->map[val - this->width * this->depth];
                                     if (next_pos->collapsed) break;
-                                    set_possibilities_to_intersection();
+                                    if (!set_possibilities_to_intersection(val - this->width * this->depth)) return false;
                                     queue.push_back(val - this->width * this->depth);
                                     if (std::count(queue.begin(), queue.end(), val - this->width * this->depth) > 1)
                                     {
@@ -233,6 +269,7 @@ namespace wfc
                         }
                     }
                 }
+                return true;
             }
 
             map_t(std::size_t width, std::size_t height) : dim(2), width(width), depth(height), height(1)
@@ -261,7 +298,7 @@ namespace wfc
                 for (std::size_t i = 0; i < map.map.size(); ++i)
                 {
                     superposition_t<T>& pos = map.map[i];
-                    if (pos.possibilities.size() <= 1) continue;
+                    if (pos.collapsed) continue;
                     float entropy = pos.shannon_entropy();
                     if (entropy < min_entropy) {
                         min_entropy = entropy;
@@ -277,9 +314,15 @@ namespace wfc
                 const std::size_t chosen = vec[idx(rng)];
 
                 superposition_t<T>& to_collapse = map.map[chosen];
-                if (to_collapse.possibilities.size() == 0) return false;
+                if (to_collapse.possibilities.size() == 0)
+                {
+                    return false;
+                }
                 to_collapse.collapse();
-                map.propagate(chosen);
+                if (!map.propagate(chosen))
+                {
+                    return false;
+                }
                 map.collapses_left--;
             }
             return true;

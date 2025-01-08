@@ -3,7 +3,7 @@ SHELL := zsh
 
 .DEFAULT_GOAL := help
 
-.PHONY: clean run debug help
+.PHONY: clean run debug help build
 
 BUILD_DIR = ./build
 ifndef BIN_NAME
@@ -19,7 +19,7 @@ clean:
 	make clean;\
 	cd ../..
 
-run:
+build:
 	@cd external/vk-engine;\
 	make lib CONFIG=$(CONFIG);\
 	cd ../..;\
@@ -27,6 +27,8 @@ run:
 	cd $(BUILD_DIR);\
 	make config=$(CONFIG);\
 	cd ..
+
+run: build
 ifeq ($(CONFIG), debug)
 	@./build/bin/Debug/$(BIN_NAME) $(ARGS)
 else
@@ -43,6 +45,7 @@ debug:
 help:
 	@echo "Usage: make { clean | run | debug | help }"
 	@echo "    clean - Remove build artifacts"
+	@echo "    build - Compile and link the program"
 	@echo "    run   - Compile, link and run the program"
 	@echo "    debug - Compile, link and run the program in the debugger"
 	@echo "            The default debugger is 'lldb', but can be changed"
