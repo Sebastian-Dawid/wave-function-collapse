@@ -112,6 +112,11 @@ namespace wfc
                 this->collapsed = true;
                 this->possibilities = { this->possibilities[chosen] };
             }
+            void collapse_from_all(std::size_t chosen)
+            {
+                this->collapsed = true;
+                this->possibilities = { this->all_possibilities[chosen] };
+            }
         };
 
     template <typename T>
@@ -316,11 +321,13 @@ namespace wfc
                 superposition_t<T>& to_collapse = map.map[chosen];
                 if (to_collapse.possibilities.size() == 0)
                 {
+                    map.collapses_left = map.map.size();
                     return false;
                 }
                 to_collapse.collapse();
                 if (!map.propagate(chosen))
                 {
+                    map.collapses_left = map.map.size();
                     return false;
                 }
                 map.collapses_left--;
