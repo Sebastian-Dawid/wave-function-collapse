@@ -158,7 +158,7 @@ namespace wfc
                         std::vector<T> neighbors = pos.find_possible_neighbors(dir);
                         std::vector<T> intersection = {};
                         superposition_t<T>* next_pos = NULL;
-                        std::function set_possibilities_to_intersection = [&] (const std::size_t v) -> bool {
+                        std::function set_possibilities_to_intersection = [&] () -> bool {
                             for (T val : next_pos->possibilities)
                             {
                                 for (T n : neighbors)
@@ -193,7 +193,7 @@ namespace wfc
                                 {
                                     next_pos = &this->map[val + this->width];
                                     if (next_pos->collapsed) break;
-                                    if (!set_possibilities_to_intersection(val + this->width)) return false;
+                                    if (!set_possibilities_to_intersection()) return false;
                                     queue.push_back(val + this->width);
                                     if (std::count(queue.begin(), queue.end(), val + this->width) > 1)
                                     {
@@ -206,7 +206,7 @@ namespace wfc
                                 {
                                     next_pos = &this->map[val + 1];
                                     if (next_pos->collapsed) break;
-                                    if (!set_possibilities_to_intersection(val + 1)) return false;
+                                    if (!set_possibilities_to_intersection()) return false;
                                     queue.push_back(val + 1);
                                     if (std::count(queue.begin(), queue.end(), val + 1) > 1)
                                     {
@@ -219,7 +219,7 @@ namespace wfc
                                 {
                                     next_pos = &this->map[val - this->width];
                                     if (next_pos->collapsed) break;
-                                    if (!set_possibilities_to_intersection(val - this->width)) return false;
+                                    if (!set_possibilities_to_intersection()) return false;
                                     queue.push_back(val - this->width);
                                     if (std::count(queue.begin(), queue.end(), val - this->width) > 1)
                                     {
@@ -232,7 +232,7 @@ namespace wfc
                                 {
                                     next_pos = &this->map[val - 1];
                                     if (next_pos->collapsed) break;
-                                    if (!set_possibilities_to_intersection(val - 1)) return false;
+                                    if (!set_possibilities_to_intersection()) return false;
                                     queue.push_back(val - 1);
                                     if (std::count(queue.begin(), queue.end(), val - 1) > 1)
                                     {
@@ -245,7 +245,7 @@ namespace wfc
                                 {
                                     next_pos = &this->map[val + this->width * this->depth];
                                     if (next_pos->collapsed) break;
-                                    if (!set_possibilities_to_intersection(val + this->width * this->depth)) return false;
+                                    if (!set_possibilities_to_intersection()) return false;
                                     queue.push_back(val + this->width * this->depth);
                                     if (std::count(queue.begin(), queue.end(), val + this->width * this->depth) > 1)
                                     {
@@ -258,7 +258,7 @@ namespace wfc
                                 {
                                     next_pos = &this->map[val - this->width * this->depth];
                                     if (next_pos->collapsed) break;
-                                    if (!set_possibilities_to_intersection(val - this->width * this->depth)) return false;
+                                    if (!set_possibilities_to_intersection()) return false;
                                     queue.push_back(val - this->width * this->depth);
                                     if (std::count(queue.begin(), queue.end(), val - this->width * this->depth) > 1)
                                     {
